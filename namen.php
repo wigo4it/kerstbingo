@@ -46,40 +46,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin: auto;
             color: #005452;
             text-align: center;
-            font-size: 18px;
+            font-size: 10px;
         }
 
         .error {
             color: red;
             text-align: center;
-            font-size: 20px;
+            font-size: 10px;
         }
 
         .success {
             color: green;
             text-align: center;
-            font-size: 20px;
+            font-size: 10px;
         }
 
         button {
             font-family: 'Anderson Four Feather Falls', sans-serif;
             color: #005452;
-            font-size: 20px;
-            border-radius: 20px;
+            font-size: 15px;
+            border-radius: 10px;
             background-color: azure;
         }
 
         input[type="text"] {
             font-family: 'Anderson Four Feather Falls', sans-serif;
-            height: 60px;
+            height: 30px;
             width: 100%;
-            max-width: 230px;
+            max-width: 150px;
             border-radius: 20px;
             border-color: #005452;
             border-width: 5px;
-            font-size: 25px;
+            font-size: 20px;
             box-sizing: border-box;
             text-align: center;
+            color: #005452;
         }
 
         @media (max-width: 600px) {
