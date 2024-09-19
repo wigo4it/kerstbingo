@@ -44,14 +44,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .container {
             max-width: 400px;
             margin: auto;
+            color: #005452;
+            text-align: center;
+            font-size: 18px;
         }
 
         .error {
             color: red;
+            text-align: center;
+            font-size: 20px;
         }
 
         .success {
             color: green;
+            text-align: center;
+            font-size: 20px;
         }
 
         button {
@@ -64,18 +71,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         input[type="text"] {
             font-family: 'Anderson Four Feather Falls', sans-serif;
-            height: 50px;
+            height: 60px;
             width: 100%;
-            /* Change width to 100% for better scaling */
-            max-width: 200px;
-            /* Set a maximum width */
+            max-width: 230px;
             border-radius: 20px;
-            color: #005452;
-            border-width: 4px;
+            border-color: #005452;
+            border-width: 5px;
             font-size: 25px;
             box-sizing: border-box;
             text-align: center;
-            /* Ensure padding and border are included in the element's total width and height */
         }
 
         @media (max-width: 600px) {
@@ -87,13 +91,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     </style>
+        <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    <script>
+        function runConfetti() {
+            confetti();
+        }
+    </script>
 </head>
 
 <body>
     <div class="container">
         <h1>Voer je naam in</h1>
         <form method="POST" action="">
-            <label for="name">Naam:</label>
             <input type="text" id="name" name="name" required>
             <button type="Versturen">Submit</button>
         </form>
@@ -102,6 +111,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
         <?php if (isset($success)): ?>
             <p class="success"><?php echo $success; ?></p>
+            <script>
+                runConfetti();
+            </script>
         <?php endif; ?>
     </div>
 </body>
