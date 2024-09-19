@@ -3,25 +3,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name']);
     $csvFilePath = 'namen.csv';
 
-    if (strpos($name, ',') !== false) {
-        $error = 'Voer alstublieft slechts één naam in.';
+    // Check if the cookie is set
+    if (isset($_COOKIE['name_added'])) {
+        $error = 'Je kunt slechts één naam toevoegen.';
     } else {
-        // Read the existing names from the CSV file
-        $names = file_exists($csvFilePath) ? file_get_contents($csvFilePath) : '';
-        $namesArray = $names ? explode(',', $names) : [];
-
-        // Convert names to lowercase for case-insensitive comparison
-        $lowercaseNames = array_map('strtolower', $namesArray);
-
-        if (in_array(strtolower($name), $lowercaseNames)) {
-            $error = 'Deze naam bestaat al!.';
+        if (strpos($name, ',') !== false) {
+            $error = 'Voer alstublieft slechts één naam in.';
         } else {
-            // Append the new name to the list
-            $namesArray[] = $name;
+            // Read the existing names from the CSV file
+            $names = file_exists($csvFilePath) ? file_get_contents($csvFilePath) : '';
+            $namesArray = $names ? explode(',', $names) : [];
 
-            // Write the updated list back to the CSV file in a comma-separated format
-            file_put_contents($csvFilePath, implode(',', $namesArray));
-            $success = 'Naam succesvol toegevoegd!';
+            // Convert names to lowercase for case-insensitive comparison
+            $lowercaseNames = array_map('strtolower', $namesArray);
+
+            if (in_array(strtolower($name), $lowercaseNames)) {
+                $error = 'Deze naam bestaat al!.';
+            } else {
+                // Append the new name to the list
+                $namesArray[] = $name;
+
+                // Write the updated list back to the CSV file in a comma-separated format
+                file_put_contents($csvFilePath, implode(',', $namesArray));
+                $success = 'Naam succesvol toegevoegd!';
+
+                // Set a cookie to disallow adding more names for 1 day
+                setcookie('name_added', '1', time() + 180); // 3 minutes
+            }
         }
     }
 }
@@ -92,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     </style>
-        <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
     <script>
         function runConfetti() {
             confetti();

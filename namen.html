@@ -4,19 +4,19 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Techorama 2024</title>
+	<title>Kwartaalmeeting zomer 2024</title>
 	<link rel="stylesheet" href="game.css">
 </head>
 
 <style>
 	.rotate {
-		--animation-duration: 1s;
-		--animation-divisor: 1;
+		--animation-duration: 41500ms;
+		--animation-divisor: 4;
 	}
 </style>
 
 <body>
-	<button id="button">Win een CO2 meter!</button>
+	<button id="button">Wie wint er een C02 meter?</button>
 	<div id="textBox"></div>
 	<canvas id="confetti"></canvas>
 	<audio id="wachtMuziekje" src="wachtMuziekje.mp3" type="audio/mp3"></audio>
@@ -36,15 +36,6 @@
 					names = data.split(',');
 					console.log(names);
 				});
-
-			// Function to shuffle the names array
-			function shuffle(array) {
-				for (let i = array.length - 1; i > 0; i--) {
-					const j = Math.floor(Math.random() * (i + 1));
-					[array[i], array[j]] = [array[j], array[i]];
-				}
-			}
-
 			// Function to handle the action
 			function handleAction() {
 				const self = button;
@@ -53,59 +44,34 @@
 				void self.offsetWidth;
 				self.classList.add('rotate');
 
-				// Select the audio element
-				const audioElement = document.getElementById('wachtMuziekje');
-
-				// Play the audio
-				audioElement.play();
-
-				// Stop the audio after 10 seconds
-
+				document.getElementById('wachtMuziekje').play();
 				document.getElementById('confetti').style.display = 'none';
-
-				shuffle(names);  // Shuffle the names before displaying them randomly
-
 				let currentIndex = 0;
-				const intervalTime = 2; //141
-				const totalTime = 1000;
+				const intervalTime = 400;
+				const totalTime = 41500;
 
 				const interval = setInterval(function () {
 					if (names.length > 0) {
-						if (names[currentIndex] === 'Golden Ticket!') {
-							textBox.style.color = 'gold';
-						} else {
-							textBox.style.color = ''; // Reset to default color
-						}
 						textBox.textContent = names[currentIndex];
 						currentIndex = (currentIndex + 1) % names.length;
 					}
 				}, intervalTime);
 
 				setTimeout(function () {
-					textBox.style.color = '';
 					clearInterval(interval);
 					if (names.length > 0) {
 						const randomIndex = Math.floor(Math.random() * names.length);
-						if (names[randomIndex] === 'Golden Ticket!') {
-							textBox.classList.add('final-name');
-							document.getElementById('confetti').style.display = 'block';
-							document.getElementById('winnaar').play();
-							textBox.textContent = 'Golden Ticket!';
-							setTimeout(() => {
-								audioElement.pause();
-								audioElement.currentTime = 0; // Reset the audio to the beginning
-							}, 100000); // 100000 milliseconds = 100 seconds
-
-						} else {
-							textBox.textContent = names[randomIndex]; // Display a random name
-							setTimeout(() => {
-								audioElement.pause();
-								audioElement.currentTime = 0; // Reset the audio to the beginning
-							}, 5000);
-						}
+						textBox.textContent = names[randomIndex]; // Display a random name
+						textBox.classList.add('final-name');
 						self.classList.remove('rotate');
 					}
 				}, totalTime);
+
+				// Show the confetti and play sound after x seconds
+				setTimeout(function () {
+					document.getElementById('confetti').style.display = 'block';
+					document.getElementById('winnaar').play();
+				}, totalTime + 100); // Adjust time as needed
 			}
 
 			// Add event listener for the button click
@@ -113,7 +79,7 @@
 
 			// Add event listener for the Enter key press
 			document.addEventListener('keydown', function (event) {
-				if (event.key === 'Enter' || event.key === ' ') {
+				if (event.key === 'Enter'|| event.key === ' ') {
 					handleAction();
 				}
 			});
