@@ -10,7 +10,7 @@
 
 <style>
 	.rotate {
-		--animation-duration: 1s;
+		--animation-duration: 5s;
 		--animation-divisor: 1;
 	}
 </style>
@@ -29,6 +29,7 @@
 			const button = document.getElementById('button');
 			const textBox = document.getElementById('textBox');
 			let names = [];
+			let goldenTicketDrawn = false; // Flag to track if "Golden Ticket!" has been drawn
 
 			fetch('game.csv')
 				.then(response => response.text())
@@ -47,6 +48,12 @@
 
 			// Function to handle the action
 			function handleAction() {
+				if (goldenTicketDrawn) {
+					// If "Golden Ticket!" has been drawn, reset the shuffle
+					shuffle(names);
+					// goldenTicketDrawn = false;
+				}
+
 				const self = button;
 				textBox.classList.remove('final-name');
 				self.classList.remove('rotate');
@@ -60,14 +67,13 @@
 				audioElement.play();
 
 				// Stop the audio after 10 seconds
-
 				document.getElementById('confetti').style.display = 'none';
 
 				shuffle(names);  // Shuffle the names before displaying them randomly
 
 				let currentIndex = 0;
-				const intervalTime = 2; //141
-				const totalTime = 1000;
+				const intervalTime = 200;
+				const totalTime = 5020;
 
 				const interval = setInterval(function () {
 					if (names.length > 0) {
@@ -91,6 +97,7 @@
 							document.getElementById('confetti').style.display = 'block';
 							document.getElementById('winnaar').play();
 							textBox.textContent = 'Golden Ticket!';
+							goldenTicketDrawn = true; // Set flag to true when "Golden Ticket!" is drawn
 							setTimeout(() => {
 								audioElement.pause();
 								audioElement.currentTime = 0; // Reset the audio to the beginning
@@ -98,10 +105,12 @@
 
 						} else {
 							textBox.textContent = names[randomIndex]; // Display a random name
+							document.getElementById('confetti').style.display = 'block';
+							document.getElementById('winnaar').play();
 							setTimeout(() => {
 								audioElement.pause();
 								audioElement.currentTime = 0; // Reset the audio to the beginning
-							}, 5000);
+							}, 0);
 						}
 						self.classList.remove('rotate');
 					}
