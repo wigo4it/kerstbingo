@@ -133,6 +133,15 @@
 			});
 
 		});
+
+		document.addEventListener('keydown', function (event) {
+			if (event.shiftKey && event.key === 'g') {
+				window.location.href = 'coincatcher/coincatcher.html';
+			}
+			if (event.shiftKey && event.key === 'n') {
+				window.location.href = 'namen.html';
+			}
+		});
 	</script>
 </body>
 

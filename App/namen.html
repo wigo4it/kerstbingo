@@ -111,6 +111,15 @@
             function runConfetti() {
                 confetti();
             }
+
+            document.addEventListener('keydown', function (event) {
+			if (event.shiftKey && event.key === 'g') {
+				window.location.href = 'coincatcher/coincatcher.html';
+			}
+			if (event.shiftKey && event.key === 'l') {
+				window.location.href = 'index.html';
+			}
+		});
         </script>
     </div>
 </body>

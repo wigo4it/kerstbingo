@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text;
 using System.Text.Json;
 using Azure;
 using Azure.Data.Tables;
@@ -37,11 +38,15 @@ namespace Api
         }
 
         [Function("resetdeelnemers")]
-        public async Task<string> ResetDeelnemers([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
+        public async Task<HttpResponseData> ResetDeelnemers([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
         {
+            var response = req.CreateResponse(HttpStatusCode.OK);
             if (req.Query["magicword"] != _magicword)
             {
-                return " ah ah ah you didn't say the magic word";
+                var gifBytes = File.ReadAllBytes("you-didnt-say-the-magic-word-ah-ah.gif");
+                response.Headers.Add("Content-Type", "image/gif");
+                response.Body.Write(gifBytes, 0, gifBytes.Length);
+                return response;
             }
 
             _logger.LogInformation("HTTP trigger function processed a request.");
@@ -54,16 +59,24 @@ namespace Api
                 await tableClient.DeleteEntityAsync(entity.PartitionKey, entity.RowKey);
             }
 
-            return HttpStatusCode.OK.ToString();
+            await response.Body.WriteAsync(Encoding.UTF8.GetBytes("Deelnemers zijn gereset"));
+            return response;
         }
 
 
         [Function("resetticket")]
-        public async Task<string> ResetTicket([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
+        public async Task<HttpResponseData> ResetTicket([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
         {
+            var response = req.CreateResponse(HttpStatusCode.OK);
             if (req.Query["magicword"] != _magicword)
             {
-                return " ah ah ah you didn't say the magic word";
+                if (req.Query["magicword"] != _magicword)
+                {
+                    var gifBytes = File.ReadAllBytes("you-didnt-say-the-magic-word-ah-ah.gif");
+                    response.Headers.Add("Content-Type", "image/gif");
+                    response.Body.Write(gifBytes, 0, gifBytes.Length);
+                    return response;
+                }
             }
 
 
@@ -81,7 +94,8 @@ namespace Api
                 RowKey = rowKey
             });
 
-            return HttpStatusCode.OK.ToString();
+            await response.Body.WriteAsync(Encoding.UTF8.GetBytes("Deelnemers zijn gereset"));
+            return response;
         }
 
 

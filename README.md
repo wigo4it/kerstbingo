@@ -44,3 +44,10 @@ To run this project, you need to have the following tools installed:
  - Set the magicword to access admin functions on the API
  `az staticwebapp appsettings set --name <YOUR_APP_ID> --setting-names "magicword=<MagicWord>"`
 
+
+ ## App navigation
+
+ shift + l for the loterij
+ shift + s for namen
+ shift + g for game
+
