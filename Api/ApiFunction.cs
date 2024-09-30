@@ -19,15 +19,15 @@ namespace Api
         public ETag ETag { get; set; }
     }
 
-    public class Function1
+    public class ApiFunction
     {
         private readonly ILogger _logger;
         private readonly string _connectionString;
         private readonly string _magicword;
 
-        public Function1(ILoggerFactory loggerFactory, IConfiguration configuration)
+        public ApiFunction(ILoggerFactory loggerFactory, IConfiguration configuration)
         {
-            _logger = loggerFactory.CreateLogger<Function1>();
+            _logger = loggerFactory.CreateLogger<ApiFunction>();
             _connectionString = configuration["connectionString"]!;
             _magicword = configuration["magicword"]!;
         }
@@ -53,7 +53,7 @@ namespace Api
 
             var tableClient = GetTableClient("participants");
             var entities = tableClient.QueryAsync<TableEntity>();
-            
+
             await foreach (var entity in entities)
             {
                 await tableClient.DeleteEntityAsync(entity.PartitionKey, entity.RowKey);
@@ -70,13 +70,10 @@ namespace Api
             var response = req.CreateResponse(HttpStatusCode.OK);
             if (req.Query["magicword"] != _magicword)
             {
-                if (req.Query["magicword"] != _magicword)
-                {
-                    var gifBytes = File.ReadAllBytes("you-didnt-say-the-magic-word-ah-ah.gif");
-                    response.Headers.Add("Content-Type", "image/gif");
-                    response.Body.Write(gifBytes, 0, gifBytes.Length);
-                    return response;
-                }
+                var gifBytes = File.ReadAllBytes("you-didnt-say-the-magic-word-ah-ah.gif");
+                response.Headers.Add("Content-Type", "image/gif");
+                response.Body.Write(gifBytes, 0, gifBytes.Length);
+                return response;
             }
 
 
@@ -168,7 +165,7 @@ namespace Api
             {
                 return HttpStatusCode.InternalServerError.ToString();
             }
-         
+
             return HttpStatusCode.Forbidden.ToString();
         }
 

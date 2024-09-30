@@ -38,16 +38,28 @@ To run this project, you need to have the following tools installed:
  - run `swa start .\App\  api --api-location .\Api\`
 
 ## Deploying the app
- - Set the connectionstring for the table storage:
+ 1. Create a static web app in azure 
+ - Set build preset to custom 
+ - set App location to /App
+ - set Api location to /Api
+
+2. After the app is deployed 
+
+ - Set the connectionstring from the table storage as an appsetting in the webapp:
  `az staticwebapp appsettings set --name <YOUR_APP_ID> --setting-names "connectionString=<KEY>"`
 
- - Set the magicword to access admin functions on the API
+ - Set the magicword to a secret word or text to access admin functions on the API
  `az staticwebapp appsettings set --name <YOUR_APP_ID> --setting-names "magicword=<MagicWord>"`
 
 
  ## App navigation
 
- shift + l for the loterij
- shift + s for namen
- shift + g for game
+ - shift + l for the loterij
+ - shift + s for namen
+ - shift + g for game
+
+ ## Admin Api endpoints
+
+ - /api/resetdeelnemers?magicword=<MAGIC_WORD>
+ - /api/resetticket?magicword=<MAGIC_WORD>
 
