@@ -113,10 +113,10 @@
             }
 
             document.addEventListener('keydown', function (event) {
-			if (event.shiftKey && event.key === 'g') {
+			if (event.shiftKey && event.key.toLowerCase() === 'g') {
 				window.location.href = 'coincatcher/coincatcher.html';
 			}
-			if (event.shiftKey && event.key === 'l') {
+			if (event.shiftKey && event.key.toLowerCase() === 'l') {
 				window.location.href = 'index.html';
 			}
 		});

@@ -202,10 +202,10 @@
 			}
 		}());
 		document.addEventListener('keydown', function (event) {
-			if (event.shiftKey && event.key === 'l') {
+			if (event.shiftKey && event.key.toLowerCase() === 'l') {
 				window.location.href = '../index.html';
 			}
-			if (event.shiftKey && event.key === 'n') {
+			if (event.shiftKey && event.key.toLowerCase() === 'n') {
 				window.location.href = '../namen.html';
 			}
 		});
