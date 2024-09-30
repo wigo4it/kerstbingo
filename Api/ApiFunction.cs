@@ -91,7 +91,7 @@ namespace Api
                 RowKey = rowKey
             });
 
-            await response.Body.WriteAsync(Encoding.UTF8.GetBytes("Deelnemers zijn gereset"));
+            await response.Body.WriteAsync(Encoding.UTF8.GetBytes("Golden ticket  is gereset"));
             return response;
         }
 
