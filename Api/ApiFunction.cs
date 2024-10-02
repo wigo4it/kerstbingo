@@ -101,6 +101,22 @@ namespace Api
         {
             _logger.LogInformation("HTTP trigger function processed a request.");
 
+
+            var deelnemerTableClient = GetTableClient("participants");
+
+            var deelnemers = await GetDeelnemers(deelnemerTableClient);
+
+            var random = new Random();
+            var winner = deelnemers[random.Next(deelnemers.Count)];
+
+            return winner;
+        }
+
+        [Function("coinorgoldenticket")]
+        public async Task<string> Ticket([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
+        {
+            _logger.LogInformation("HTTP trigger function processed a request.");
+
             var ticketTableClient = GetTableClient("goldenticket");
 
             var partitionKey = "ticket";
@@ -112,7 +128,7 @@ namespace Api
                 return "";
             }
 
-            var deelnemerTableClient = GetTableClient("participants");
+            var deelnemerTableClient = GetTableClient("coinorgoldenticket");
 
             var deelnemers = await GetDeelnemers(deelnemerTableClient);
 
