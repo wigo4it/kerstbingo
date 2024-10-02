@@ -130,16 +130,16 @@
 				if (event.key === 'Enter' || event.key === ' ') {
 					handleAction();
 				}
-				if (event.shiftKey && event.key.toLowerCase() === 'i') {
+				if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === 'i') {
 					window.location.href = 'index.html';
 				}
-				if (event.shiftKey && event.key.toLowerCase() === 'p') {
+				if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === 'p') {
 					window.location.href = 'participants.html';
 				}
-				if (event.shiftKey && event.key.toLowerCase() === 'g') {
+				if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === 'g') {
 					window.location.href = 'game.html';
 				}
-				if (event.shiftKey && event.key.toLowerCase() === 'r') {
+				if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === 'r') {
 					window.location.href = '/api/resetticket?magicword=YoshuaRules!';
 				}
 			});

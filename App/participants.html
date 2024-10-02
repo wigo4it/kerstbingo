@@ -80,6 +80,18 @@
             document.getElementById('nameForm').addEventListener('submit', async function (event) {
                 event.preventDefault();
 
+                // Controleer of er al een deelname is geweest binnen de laatste 5 minuten
+                const lastEntryTime = localStorage.getItem('lastEntryTime');
+                const currentTime = new Date().getTime();
+                const fiveMinutes = 5 * 60 * 1000;
+
+                if (lastEntryTime && (currentTime - lastEntryTime) < fiveMinutes) {
+                    const timeRemaining = Math.ceil((fiveMinutes - (currentTime - lastEntryTime)) / 1000);
+                    document.querySelector('.error').innerText = `Je hebt al meegedaan.`;
+                    document.querySelector('.success').innerText = '';
+                    return; // Blokkeer verdere deelname
+                }
+
                 const name = document.getElementById('name').value; // Bewaar de naam in originele vorm
 
                 try {
@@ -117,6 +129,9 @@
                         throw new Error('Deelnemer niet toegevoegd');
                     }
 
+                    // Sla de tijd van deelname op in localStorage
+                    localStorage.setItem('lastEntryTime', currentTime);
+
                     document.querySelector('.success').innerText = 'Naam toegevoegd!';
                     document.querySelector('.error').innerText = '';
                     runConfetti();
@@ -127,23 +142,23 @@
                 document.getElementById('nameForm').reset();
             });
 
-
             function runConfetti() {
                 confetti();
             }
 
             document.addEventListener('keydown', function (event) {
-                if (event.shiftKey && event.key.toLowerCase() === 'i') {
+                if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === 'i') {
                     window.location.href = 'index.html';
                 }
-                if (event.shiftKey && event.key.toLowerCase() === 'p') {
+                if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === 'p') {
                     window.location.href = 'participants.html';
                 }
-                if (event.shiftKey && event.key.toLowerCase() === 'g') {
+                if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === 'g') {
                     window.location.href = 'game.html';
                 }
             });
         </script>
+
     </div>
 </body>
 
