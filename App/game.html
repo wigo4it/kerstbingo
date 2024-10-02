@@ -72,18 +72,6 @@
 				const intervalTime = 300;
 				const totalTime = 5020;
 
-				const interval = setInterval(function () {
-					if (names.length > 0) {
-						if (names[currentIndex] === 'Golden Ticket!') {
-							textBox.style.color = 'gold';
-						} else {
-							textBox.style.color = ''; // Reset to default color
-						}
-						textBox.textContent = names[currentIndex];
-						currentIndex = (currentIndex + 1) % names.length;
-					}
-				}, intervalTime);
-
 				let winner;
 				try {
 					const response = await fetch('/api/draw', {
@@ -105,15 +93,9 @@
 				setTimeout(function () {
 					textBox.style.color = '';
 					clearInterval(interval);
-					if (names.includes(winner)) {
-						textBox.textContent = winner;
-						textBox.classList.add('final-name');
-						document.getElementById('confetti').style.display = 'block';
-						document.getElementById('winnaar').play();
-					} else {
-						textBox.textContent = 'Geen Winnaar';
-						textBox.style.color = 'red';
-					}
+    				textBox.classList.add('final-name');
+					document.getElementById('confetti').style.display = 'block';
+					document.getElementById('winnaar').play();
 					setTimeout(() => {
 						audioElement.pause();
 						audioElement.currentTime = 0; // Reset the audio to the beginning
