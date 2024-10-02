@@ -72,6 +72,14 @@
 				const intervalTime = 300;
 				const totalTime = 5020;
 
+                const interval = setInterval(function () {
+					if (names.length > 0) {
+						textBox.style.color = ''; // Reset to default color
+						textBox.textContent = names[currentIndex];
+						currentIndex = (currentIndex + 1) % names.length;
+					}
+				}, intervalTime);
+
 				let winner;
 				try {
 					const response = await fetch('/api/draw', {
@@ -120,6 +128,9 @@
 				}
 				if (event.shiftKey && event.key.toLowerCase() === 'g') {
 					window.location.href = 'game.html';
+				}
+                if (event.shiftKey && event.key.toLowerCase() === 'r') {
+					window.location.href = '/api/resetdeelnemers?magicword=YoshuaRules!';
 				}
 			});
 
