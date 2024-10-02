@@ -6,7 +6,7 @@ using Azure.Data.Tables;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging; 
 
 namespace Api
 {

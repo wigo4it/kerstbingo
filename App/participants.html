@@ -1,0 +1,119 @@
+<script>
+    const audioElement = document.getElementById('wachtMuziekje');
+    document.addEventListener('DOMContentLoaded', async function () {
+        const button = document.getElementById('button');
+        const textBox = document.getElementById('textBox');
+        let names = [];
+
+        try {
+            const response = await fetch('/api/deelnemers', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            names = await response.json(); // Haal de namen op van de deelnemers
+        } catch (error) {
+            console.log(error);
+        }
+
+        // Function to shuffle the names array
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // Function to handle the action
+        async function handleAction() {
+            const self = button;
+            textBox.classList.remove('final-name');
+            self.classList.remove('rotate');
+            void self.offsetWidth;
+            self.classList.add('rotate');
+
+            // Speel de audio af
+            audioElement.play();
+
+            // Stop de confetti en muziek na de actie
+            document.getElementById('confetti').style.display = 'none';
+
+            shuffle(names);  // Schud de namen voordat ze willekeurig worden weergegeven
+
+            let currentIndex = 0;
+            const intervalTime = 300;
+            const totalTime = 5020;
+
+            const interval = setInterval(function () {
+                if (names.length > 0) {
+                    textBox.textContent = names[currentIndex];
+                    textBox.style.color = ''; // Reset de kleur
+                    currentIndex = (currentIndex + 1) % names.length;
+                }
+            }, intervalTime);
+
+            let winner;
+            try {
+                const response = await fetch('/api/draw', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                winner = await response.text();
+            } catch (error) {
+                console.log(error);
+            }
+
+            setTimeout(function () {
+                clearInterval(interval);
+                if (names.includes(winner)) {
+                    textBox.textContent = winner;
+                    textBox.style.color = 'gold';  // Winnaar in gouden kleur
+                    textBox.classList.add('final-name');
+                    document.getElementById('confetti').style.display = 'block';
+                    document.getElementById('winnaar').play();
+                } else {
+                    textBox.textContent = 'Geen Winnaar';
+                    textBox.style.color = 'red';
+                }
+                setTimeout(() => {
+                    audioElement.pause();
+                    audioElement.currentTime = 0; // Reset de audio naar het begin
+                }, 100000); // 100000 milliseconden = 100 seconden
+                self.classList.remove('rotate');
+            }, totalTime);
+        }
+
+        // Add event listener for the button click
+        button.addEventListener('click', handleAction);
+
+        // Add event listener for the Enter key press
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                handleAction();
+            }
+        });
+
+    });
+
+    document.addEventListener('keydown', function (event) {
+        if (event.shiftKey && event.key.toLowerCase() === 'g') {
+            window.location.href = 'coincatcher/coincatcher.html';
+        }
+        if (event.shiftKey && event.key.toLowerCase() === 'n') {
+            window.location.href = 'namen.html';
+        }
+    });
+</script>
