@@ -76,7 +76,7 @@
 
 				let currentIndex = 0;
 				const intervalTime = 300;
-				const totalTime = 5020;
+				const totalTime = 45020;
 
                 const interval = setInterval(function () {
 					if (names.length > 0) {
@@ -113,7 +113,7 @@
 					setTimeout(() => {
 						audioElement.pause();
 						audioElement.currentTime = 0; // Reset the audio to the beginning
-					}, 100000); // 100000 milliseconds = 100 seconds
+					}, 200000); // 200000 milliseconds = 200 seconds
 					self.classList.remove('rotate');
 				}, totalTime);
 			}
@@ -126,16 +126,16 @@
 				if (event.key === 'Enter' || event.key === ' ') {
 					handleAction();
 				}
-				if (event.ctrlKey && event.altKey && event.key.toLowerCase() === 'i') {
+				if (event.shiftKey && event.key.toLowerCase() === 'i') {
 					window.location.href = 'index.html';
 				}
-				if (event.ctrlKey && event.altKey && event.key.toLowerCase() === 'p') {
+				if (event.shiftKey && event.key.toLowerCase() === 'p') {
 					window.location.href = 'participants.html';
 				}
-				if (event.ctrlKey && event.altKey && event.key.toLowerCase() === 'g') {
+				if (event.shiftKey && event.key.toLowerCase() === 'g') {
 					window.location.href = 'game.html';
 				}
-                if (event.ctrlKey && event.altKey && event.key.toLowerCase() === 'r') {
+                if (event.shiftKey && event.key.toLowerCase() === 'r') {
 					window.location.href = '/api/resetdeelnemers?magicword=YoshuaRules!';
 				}
 			});
