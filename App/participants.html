@@ -1,119 +1,150 @@
-<script>
-    const audioElement = document.getElementById('wachtMuziekje');
-    document.addEventListener('DOMContentLoaded', async function () {
-        const button = document.getElementById('button');
-        const textBox = document.getElementById('textBox');
-        let names = [];
+<!DOCTYPE html>
+<html lang="en">
 
-        try {
-            const response = await fetch('/api/deelnemers', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voeg je naam toe</title>
+    <link rel="stylesheet" href="game.css">
+    <style>
+        body {
+            font-family: 'Anderson Four Feather Falls', sans-serif;
+            margin: 20px;
+            background-image: url('assets/namen.png');
+        }
+
+        .container {
+            max-width: 400px;
+            margin: auto;
+            color: #005452;
+            text-align: center;
+            font-size: 10px;
+        }
+
+        .error {
+            color: red;
+            text-align: center;
+            font-size: 10px;
+        }
+
+        .success {
+            color: green;
+            text-align: center;
+            font-size: 10px;
+        }
+
+        button {
+            font-family: 'Anderson Four Feather Falls', sans-serif;
+            color: #005452;
+            font-size: 15px;
+            border-radius: 10px;
+            background-color: azure;
+        }
+
+        input[type="text"] {
+            font-family: 'Anderson Four Feather Falls', sans-serif;
+            height: 30px;
+            width: 100%;
+            max-width: 150px;
+            border-radius: 20px;
+            border-color: #005452;
+            border-width: 5px;
+            font-size: 20px;
+            box-sizing: border-box;
+            text-align: center;
+            color: #005452;
+        }
+
+        @media (max-width: 600px) {
+            input[type="text"] {
+                height: 50px;
+                /* Adjust height for smaller screens */
+                font-size: 20px;
+                /* Adjust font size for smaller screens */
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Voer je naam in</h1>
+        <form id="nameForm">
+            <input type="text" id="name" name="name" required>
+            <button type="submit">Submit</button>
+        </form>
+        <p class="error"></p>
+        <p class="success"></p>
+        <script>
+            document.getElementById('nameForm').addEventListener('submit', async function (event) {
+                event.preventDefault();
+
+                const name = document.getElementById('name').value; // Bewaar de naam in originele vorm
+
+                try {
+                    // Haal alle bestaande namen op
+                    const deelnemersResponse = await fetch('/api/deelnemers', {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (!deelnemersResponse.ok) {
+                        throw new Error('Kan deelnemers niet ophalen');
+                    }
+
+                    const deelnemers = await deelnemersResponse.json();
+
+                    // Check of de naam al bestaat (case-insensitive)
+                    const nameExists = deelnemers.some(deelnemer => deelnemer.toLowerCase() === name.toLowerCase());
+
+                    if (nameExists) {
+                        throw new Error('Deelnemer bestaat al');
+                    }
+
+                    // Als de naam nog niet bestaat, voeg deze toe
+                    const response = await fetch('/api/deelnemers', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: name // Stuur de naam in originele vorm
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Deelnemer niet toegevoegd');
+                    }
+
+                    document.querySelector('.success').innerText = 'Naam toegevoegd!';
+                    document.querySelector('.error').innerText = '';
+                    runConfetti();
+                } catch (error) {
+                    document.querySelector('.error').innerText = error.message;
+                    document.querySelector('.success').innerText = '';
                 }
+                document.getElementById('nameForm').reset();
             });
 
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
+
+            function runConfetti() {
+                confetti();
             }
 
-            names = await response.json(); // Haal de namen op van de deelnemers
-        } catch (error) {
-            console.log(error);
-        }
-
-        // Function to shuffle the names array
-        function shuffle(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-        }
-
-        // Function to handle the action
-        async function handleAction() {
-            const self = button;
-            textBox.classList.remove('final-name');
-            self.classList.remove('rotate');
-            void self.offsetWidth;
-            self.classList.add('rotate');
-
-            // Speel de audio af
-            audioElement.play();
-
-            // Stop de confetti en muziek na de actie
-            document.getElementById('confetti').style.display = 'none';
-
-            shuffle(names);  // Schud de namen voordat ze willekeurig worden weergegeven
-
-            let currentIndex = 0;
-            const intervalTime = 300;
-            const totalTime = 5020;
-
-            const interval = setInterval(function () {
-                if (names.length > 0) {
-                    textBox.textContent = names[currentIndex];
-                    textBox.style.color = ''; // Reset de kleur
-                    currentIndex = (currentIndex + 1) % names.length;
+            document.addEventListener('keydown', function (event) {
+                if (event.shiftKey && event.key.toLowerCase() === 'i') {
+                    window.location.href = 'index.html';
                 }
-            }, intervalTime);
-
-            let winner;
-            try {
-                const response = await fetch('/api/draw', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                if (event.shiftKey && event.key.toLowerCase() === 'p') {
+                    window.location.href = 'participants.html';
                 }
-
-                winner = await response.text();
-            } catch (error) {
-                console.log(error);
-            }
-
-            setTimeout(function () {
-                clearInterval(interval);
-                if (names.includes(winner)) {
-                    textBox.textContent = winner;
-                    textBox.style.color = 'gold';  // Winnaar in gouden kleur
-                    textBox.classList.add('final-name');
-                    document.getElementById('confetti').style.display = 'block';
-                    document.getElementById('winnaar').play();
-                } else {
-                    textBox.textContent = 'Geen Winnaar';
-                    textBox.style.color = 'red';
+                if (event.shiftKey && event.key.toLowerCase() === 'g') {
+                    window.location.href = 'game.html';
                 }
-                setTimeout(() => {
-                    audioElement.pause();
-                    audioElement.currentTime = 0; // Reset de audio naar het begin
-                }, 100000); // 100000 milliseconden = 100 seconden
-                self.classList.remove('rotate');
-            }, totalTime);
-        }
+            });
+        </script>
+    </div>
+</body>
 
-        // Add event listener for the button click
-        button.addEventListener('click', handleAction);
-
-        // Add event listener for the Enter key press
-        document.addEventListener('keydown', function (event) {
-            if (event.key === 'Enter' || event.key === ' ') {
-                handleAction();
-            }
-        });
-
-    });
-
-    document.addEventListener('keydown', function (event) {
-        if (event.shiftKey && event.key.toLowerCase() === 'g') {
-            window.location.href = 'coincatcher/coincatcher.html';
-        }
-        if (event.shiftKey && event.key.toLowerCase() === 'n') {
-            window.location.href = 'namen.html';
-        }
-    });
-</script>
+</html>
