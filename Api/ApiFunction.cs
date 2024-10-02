@@ -62,24 +62,32 @@ namespace Api
                 await tableClient.DeleteEntityAsync(entity.PartitionKey, entity.RowKey);
             }
 
-            // Stap 2: Voeg de testdeelnemers test1 en test2 toe
-            var test1 = new TableEntity
+            // Controleer of "golden" als parameter wordt meegegeven
+            if (req.Query.ContainsKey("golden"))
             {
-                PartitionKey = "deelnemer",
-                RowKey = "Golden Ticket!"
-            };
+                // Stap 2: Voeg de testdeelnemers coin en goldenTicket toe
+                var coin = new TableEntity
+                {
+                    PartitionKey = "deelnemer",
+                    RowKey = "Golden Ticket!"
+                };
 
-            var test2 = new TableEntity
+                var goldenTicket = new TableEntity
+                {
+                    PartitionKey = "deelnemer",
+                    RowKey = "Coin"
+                };
+
+                await tableClient.AddEntityAsync(coin);
+                await tableClient.AddEntityAsync(goldenTicket);
+
+                await response.Body.WriteAsync(Encoding.UTF8.GetBytes("Coin en Golden Ticket zijn toegevoegd."));
+            }
+            else
             {
-                PartitionKey = "deelnemer",
-                RowKey = "Coin"
-            };
+                await response.Body.WriteAsync(Encoding.UTF8.GetBytes("Deelnemers zijn gereset."));
+            }
 
-            await tableClient.AddEntityAsync(test1);
-            await tableClient.AddEntityAsync(test2);
-
-            // Bericht naar de response schrijven
-            await response.Body.WriteAsync(Encoding.UTF8.GetBytes("Deelnemers zijn gereset en test1 en test2 zijn toegevoegd"));
             return response;
         }
 
