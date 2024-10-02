@@ -97,7 +97,7 @@ namespace Api
 
 
         [Function("draw")]
-        public async Task<string> Ticket([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
+        public async Task<string> Participant([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
         {
             _logger.LogInformation("HTTP trigger function processed a request.");
 
