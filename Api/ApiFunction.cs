@@ -6,7 +6,7 @@ using Azure.Data.Tables;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging; 
+using Microsoft.Extensions.Logging;
 
 namespace Api
 {
@@ -41,6 +41,8 @@ namespace Api
         public async Task<HttpResponseData> ResetDeelnemers([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
         {
             var response = req.CreateResponse(HttpStatusCode.OK);
+
+            // Controleer of de juiste magicword is meegegeven
             if (req.Query["magicword"] != _magicword)
             {
                 var gifBytes = File.ReadAllBytes("you-didnt-say-the-magic-word-ah-ah.gif");
@@ -49,17 +51,35 @@ namespace Api
                 return response;
             }
 
-            _logger.LogInformation("HTTP trigger function processed a request.");
+            _logger.LogInformation("Resetting participants table.");
 
             var tableClient = GetTableClient("participants");
-            var entities = tableClient.QueryAsync<TableEntity>();
 
+            // Stap 1: Leeg de tabel participants
+            var entities = tableClient.QueryAsync<TableEntity>();
             await foreach (var entity in entities)
             {
                 await tableClient.DeleteEntityAsync(entity.PartitionKey, entity.RowKey);
             }
 
-            await response.Body.WriteAsync(Encoding.UTF8.GetBytes("Deelnemers zijn gereset"));
+            // Stap 2: Voeg de testdeelnemers test1 en test2 toe
+            var test1 = new TableEntity
+            {
+                PartitionKey = "deelnemer",
+                RowKey = "Golden Ticket!"
+            };
+
+            var test2 = new TableEntity
+            {
+                PartitionKey = "deelnemer",
+                RowKey = "Coin"
+            };
+
+            await tableClient.AddEntityAsync(test1);
+            await tableClient.AddEntityAsync(test2);
+
+            // Bericht naar de response schrijven
+            await response.Body.WriteAsync(Encoding.UTF8.GetBytes("Deelnemers zijn gereset en test1 en test2 zijn toegevoegd"));
             return response;
         }
 
@@ -95,24 +115,7 @@ namespace Api
             return response;
         }
 
-
         [Function("draw")]
-        public async Task<string> Participant([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
-        {
-            _logger.LogInformation("HTTP trigger function processed a request.");
-
-
-            var deelnemerTableClient = GetTableClient("participants");
-
-            var deelnemers = await GetDeelnemers(deelnemerTableClient);
-
-            var random = new Random();
-            var winner = deelnemers[random.Next(deelnemers.Count)];
-
-            return winner;
-        }
-
-        [Function("coinorgoldenticket")]
         public async Task<string> Ticket([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
         {
             _logger.LogInformation("HTTP trigger function processed a request.");
@@ -128,7 +131,7 @@ namespace Api
                 return "";
             }
 
-            var deelnemerTableClient = GetTableClient("coinorgoldenticket");
+            var deelnemerTableClient = GetTableClient("participants");
 
             var deelnemers = await GetDeelnemers(deelnemerTableClient);
 
