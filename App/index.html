@@ -136,6 +136,7 @@
 				setTimeout(() => {
 					audioElement.pause();
 					audioElement.currentTime = 0; // Reset the audio to the beginning
+					window.location.reload();
 				}, 5000); // 5000 milliseconds = 5 seconds
 				self.classList.remove('rotate');
 			}, totalTime);
