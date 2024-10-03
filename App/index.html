@@ -99,7 +99,12 @@
 			const interval = setInterval(function () {
 				if (names.length > 0) {
 					textBox.style.color = ''; // Reset to default color
-					textBox.textContent = names[currentIndex];
+
+					if (!goldenTicket.isdrawn) {
+						textBox.textContent = names[currentIndex];
+					} else {
+						textBox.textContent = "Coin";
+					}
 					currentIndex = (currentIndex + 1) % names.length;
 				}
 			}, intervalTime);
