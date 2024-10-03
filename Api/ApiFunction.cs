@@ -89,8 +89,6 @@ namespace Api
             }
 
             // Stap 2: Voeg coin toe
-            var ticket = new TableEntity
- 
             var coin = new TableEntity
             {
                 PartitionKey = "deelnemer",
