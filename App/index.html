@@ -67,115 +67,107 @@
 				console.log(error);
 			}
 
-			// Function to shuffle the names array
-			function shuffle(array) {
-				for (let i = array.length - 1; i > 0; i--) {
-					const j = Math.floor(Math.random() * (i + 1));
-					[array[i], array[j]] = [array[j], array[i]];
-				}
+		// Function to shuffle the names array
+		function shuffle(array) {
+			for (let i = array.length - 1; i > 0; i--) {
+				const j = Math.floor(Math.random() * (i + 1));
+				[array[i], array[j]] = [array[j], array[i]];
 			}
+		}
 
-			// Function to handle the action
-			async function handleAction() {
-				const self = button;
-				textBox.classList.remove('final-name');
-				self.classList.remove('rotate');
-				void self.offsetWidth;
-				self.classList.add('rotate');
+		// Function to handle the action
+		async function handleAction() {
+			const self = button;
+			textBox.classList.remove('final-name');
+			self.classList.remove('rotate');
+			void self.offsetWidth;
+			self.classList.add('rotate');
 
-				// Select the audio element
-				// Play the audio
-				audioElement.play();
+			// Select the audio element
+			// Play the audio
+			audioElement.play();
 
-				// Stop the audio after 10 seconds
-				document.getElementById('confetti').style.display = 'none';
+			// Stop the audio after 10 seconds
+			document.getElementById('confetti').style.display = 'none';
 
-				shuffle(names);  // Shuffle the names before displaying them randomly
+			shuffle(names);  // Shuffle the names before displaying them randomly
 
-				let currentIndex = 0;
-				const intervalTime = 300;
-				const totalTime = 5020;
+			let currentIndex = 0;
+			const intervalTime = 300;
+			const totalTime = 5020;
 
-				const interval = setInterval(function () {
-					if (names.length > 0) {
-						textBox.style.color = ''; // Reset to default color
-						textBox.textContent = names[currentIndex];
-						currentIndex = (currentIndex + 1) % names.length;
-					}
-				}, intervalTime);
-
-				let winner;
-				try {
-					const response = await fetch('/api/draw', {
-						method: 'GET',
-						headers: {
-							'Content-Type': 'application/json'
-						}
-					});
-
-					if (!response.ok) {
-						throw new Error('Network response was not ok');
-					}
-
-					winner = await response.text();
-				} catch (error) {
-					console.log(error);
+			const interval = setInterval(function () {
+				if (names.length > 0) {
+					textBox.style.color = ''; // Reset to default color
+					textBox.textContent = names[currentIndex];
+					currentIndex = (currentIndex + 1) % names.length;
 				}
+			}, intervalTime);
 
-				setTimeout(function () {
-					textBox.style.color = '';
-					clearInterval(interval);
-
-					if (!goldenTicket.isdrawn) {
-						textBox.classList.add('Coin');
-					} else {
-						textBox.classList.add('final-name');
-					}
-
-					document.getElementById('confetti').style.display = 'block';
-					document.getElementById('winnaar').play();
-
-					setTimeout(() => {
-						audioElement.pause();
-						audioElement.currentTime = 0; // Reset the audio to the beginning
-					}, 5000); // 5000 milliseconds = 5 seconds
-
-					self.classList.remove('rotate');
-				}, totalTime);
-			}
-
-				// Add event listener for the button click
-				button.addEventListener('click', handleAction);
-
-				// Add event listener for the Enter key press
-				document.addEventListener('keydown', function (event) {
-					if (event.key === 'Enter' || event.key === ' ') {
-						handleAction();
-					}
-					if (event.shiftKey && event.key.toLowerCase() === 'i') {
-						window.location.href = 'index.html';
-					}
-					if (event.shiftKey && event.key.toLowerCase() === 'p') {
-						window.location.href = 'participants.html';
-					}
-					if (event.shiftKey && event.key.toLowerCase() === 'g') {
-						window.location.href = 'game.html';
-					}
-					if (event.shiftKey && event.key.toLowerCase() === 'r') {
-						window.location.href = '/api/resetdeelnemers?magicword=';
-					}
-					if (event.shiftKey && event.key.toLowerCase() === 'c') {
-						window.location.href = '/api/addcoin?magicword=';
-					}
-					if (event.shiftKey && event.key.toLowerCase() === 't') {
-						window.location.href = '/api/resetticket?magicword=';
-					}
-					if (event.shiftKey && event.key.toLowerCase() === 'e') {
-						window.location.href = '/coincatcher/CoinCatcher.html';
+			let winner;
+			try {
+				const response = await fetch('/api/draw', {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json'
 					}
 				});
 
-			});
+				if (!response.ok) {
+					throw new Error('Network response was not ok');
+				}
+
+				winner = await response.text();
+			} catch (error) {
+				console.log(error);
+			}
+
+			setTimeout(function () {
+				textBox.style.color = '';
+				clearInterval(interval);
+				textBox.classList.add('final-name');
+				document.getElementById('confetti').style.display = 'block';
+				document.getElementById('winnaar').play();
+				setTimeout(() => {
+					audioElement.pause();
+					audioElement.currentTime = 0; // Reset the audio to the beginning
+				}, 5000); // 5000 milliseconds = 5 seconds
+				self.classList.remove('rotate');
+			}, totalTime);
+		}
+
+		// Add event listener for the button click
+		button.addEventListener('click', handleAction);
+
+		// Add event listener for the Enter key press
+		document.addEventListener('keydown', function (event) {
+			if (event.key === 'Enter' || event.key === ' ') {
+				handleAction();
+			}
+			if (event.shiftKey && event.key.toLowerCase() === 'i') {
+				window.location.href = 'index.html';
+			}
+			if (event.shiftKey && event.key.toLowerCase() === 'p') {
+				window.location.href = 'participants.html';
+			}
+			if (event.shiftKey && event.key.toLowerCase() === 'g') {
+				window.location.href = 'game.html';
+			}
+			if (event.shiftKey && event.key.toLowerCase() === 'r') {
+				window.location.href = '/api/resetdeelnemers?magicword=';
+			}
+			if (event.shiftKey && event.key.toLowerCase() === 'c') {
+				window.location.href = '/api/addcoin?magicword=';
+			}
+			if (event.shiftKey && event.key.toLowerCase() === 't') {
+				window.location.href = '/api/resetticket?magicword=';
+			}
+			if (event.shiftKey && event.key.toLowerCase() === 'e') {
+				window.location.href = '/coincatcher/CoinCatcher.html';
+			}
+		});
+
+		});
 	</script>
 </body>
 
