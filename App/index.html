@@ -81,7 +81,8 @@
                 const interval = setInterval(function () {
 					if (names.length > 0) {
 						textBox.style.color = ''; // Reset to default color
-						textBox.textContent = names[currentIndex];
+						textBox.textContent = "coin"
+						//textBox.textContent = names[currentIndex];
 						currentIndex = (currentIndex + 1) % names.length;
 					}
 				}, intervalTime);
