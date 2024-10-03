@@ -62,4 +62,3 @@ To run this project, you need to have the following tools installed:
 
  - /api/resetdeelnemers?magicword=<MAGIC_WORD>
  - /api/resetticket?magicword=<MAGIC_WORD>
-

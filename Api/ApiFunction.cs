@@ -6,7 +6,7 @@ using Azure.Data.Tables;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging; 
 
 namespace Api
 {
@@ -41,51 +41,24 @@ namespace Api
         public async Task<HttpResponseData> ResetDeelnemers([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
         {
             var response = req.CreateResponse(HttpStatusCode.OK);
-
-            // Controleer of de juiste magicword is meegegeven
-            if (req.Query["magicword"] != _magicword)
             {
                 var response = req.CreateResponse(HttpStatusCode.Unauthorized); // Gebruik een meer passende HTTP status code
                 await response.WriteStringAsync("Je hebt niet het juiste magic word gezegd!");
                 return response;
             }
 
-            if (req.Query["magicword"] == _magicword)
+            _logger.LogInformation("HTTP trigger function processed a request.");
+
+            var tableClient = GetTableClient("participants");
+            var entities = tableClient.QueryAsync<TableEntity>();
+
+            await foreach (var entity in entities)
             {
-                logger.LogInformation("Resetting participants table.");
-                var tableClient = GetTableClient("participants");
-                // Stap 1: Leeg de tabel participants
-                var entities = tableClient.QueryAsync<TableEntity>();
-                await foreach (var entity in entities)
-                {
-                    await tableClient.DeleteEntityAsync(entity.PartitionKey, entity.RowKey);
-                }
+                await tableClient.DeleteEntityAsync(entity.PartitionKey, entity.RowKey);
             }
 
-            if (req.Query["magicword"] == _magicword)
-            {
-                // Stap 2: Voeg de testdeelnemers coin en goldenTicket toe
-                logger.LogInformation("Resetting participants table.");
-                var tableClient = GetTableClient("participants");
-                var coin = new TableEntity
-                {
-                    PartitionKey = "deelnemer",
-                    RowKey = "Golden Ticket!"
-                };
-
-                var goldenTicket = new TableEntity
-                {
-                    PartitionKey = "deelnemer",
-                    RowKey = "Coin"
-                };
-
-                await tableClient.AddEntityAsync(coin);
-                await tableClient.AddEntityAsync(goldenTicket);
-
-                // Bericht naar de response schrijven
-                await response.Body.WriteAsync(Encoding.UTF8.GetBytes("Deelnemers zijn gereset en coin + golden ticket zijn toegevoegd."));
-                return response;
-            }
+            await response.Body.WriteAsync(Encoding.UTF8.GetBytes("Deelnemers zijn gereset"));
+            return response;
         }
 
 
@@ -118,6 +91,7 @@ namespace Api
             await response.Body.WriteAsync(Encoding.UTF8.GetBytes("Golden ticket  is gereset"));
             return response;
         }
+
 
         [Function("draw")]
         public async Task<string> Ticket([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
