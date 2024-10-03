@@ -63,8 +63,8 @@ namespace Api
             return response;
         }
 
-        [Function("addticket")]
-        public async Task<HttpResponseData> AddTicket([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
+        [Function("addcoin")]
+        public async Task<HttpResponseData> AddCoin([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
         {
             var response = req.CreateResponse(HttpStatusCode.OK);
 
@@ -88,24 +88,19 @@ namespace Api
                 await tableClient.DeleteEntityAsync(entity.PartitionKey, entity.RowKey);
             }
 
-            // Stap 2: Voeg ticket en coin toe
+            // Stap 2: Voeg coin toe
             var ticket = new TableEntity
-            {
-                PartitionKey = "deelnemer",
-                RowKey = "Golden Ticket!"
-            };
-
+ 
             var coin = new TableEntity
             {
                 PartitionKey = "deelnemer",
                 RowKey = "Coin"
             };
 
-            await tableClient.AddEntityAsync(ticket);
             await tableClient.AddEntityAsync(coin);
 
             // Bericht naar de response schrijven
-            await response.Body.WriteAsync(Encoding.UTF8.GetBytes("Golden Ticket is toegevoegd"));
+            await response.Body.WriteAsync(Encoding.UTF8.GetBytes("Coin is toegevoegd"));
             return response;
         }
 
