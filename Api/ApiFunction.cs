@@ -65,6 +65,8 @@ namespace Api
             if (req.Query["magicword"] == _magicword)
             {
                 // Stap 2: Voeg de testdeelnemers coin en goldenTicket toe
+                logger.LogInformation("Resetting participants table.");
+                var tableClient = GetTableClient("participants");
                 var coin = new TableEntity
                 {
                     PartitionKey = "deelnemer",
