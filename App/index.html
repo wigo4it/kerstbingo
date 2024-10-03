@@ -39,7 +39,7 @@
 			}
 			// Function to determine the final text
 			function determineFinalText() {
-				const randomNumber = Math.floor(Math.random() * 50);  // Generate a number between 0 and 99
+				const randomNumber = Math.floor(Math.random() * 50);  // Generate a number between 0 and 49
 				return randomNumber === 0 ? "Golden Ticket!" : "Coin"; // 2% chance to be "Golden Ticket"
 			}
 
@@ -60,8 +60,8 @@
 				shuffle(names);  // Shuffle the names before displaying them randomly
 
 				let currentIndex = 0;
-				const intervalTime = 400;
-				const totalTime = 5020;
+				const intervalTime = 350;
+				const totalTime = 10020;
 
 				const interval = setInterval(function () {
 					if (names.length > 0) {
@@ -73,32 +73,37 @@
 				setTimeout(function () {
 					textBox.style.color = '';
 					clearInterval(interval);
-					textBox.textContent = determineFinalText();
+					const finalText = determineFinalText(); // Determine final text and store it in a variable
+					textBox.textContent = finalText;
 					textBox.classList.add('final-name');
 					document.getElementById('confetti').style.display = 'block';
 					document.getElementById('winnaar').play();
-					setTimeout(() => {
-						audioElement.pause();
-						audioElement.currentTime = 0; // Reset the audio to the beginning
-					}, 5000); // 5000 milliseconds = 5 seconds
+
+					// Only pause the audio and reset if the text is not "Golden Ticket!"
+					if (finalText !== "Golden Ticket!") {
+						setTimeout(() => {
+							audioElement.pause();
+							audioElement.currentTime = 0; // Reset the audio to the beginning
+						}, 100); // Adjust the timeout as needed
+					}
 					self.classList.remove('rotate');
 				}, totalTime);
 			}
 
-			// Add event listener for the button click
-			button.addEventListener('click', handleAction);
+				// Add event listener for the button click
+				button.addEventListener('click', handleAction);
 
-			// Add event listener for the Enter key press
-			document.addEventListener('keydown', function (event) {
-				if (event.key === 'Enter' || event.key === ' ') {
-					handleAction();
-				}
-				if (event.shiftKey && event.key.toLowerCase() === 'g') {
-					window.location.href = 'game.html';
-				}
+				// Add event listener for the Enter key press
+				document.addEventListener('keydown', function (event) {
+					if (event.key === 'Enter' || event.key === ' ') {
+						handleAction();
+					}
+					if (event.shiftKey && event.key.toLowerCase() === 'g') {
+						window.location.href = 'game.html';
+					}
+				});
+
 			});
-
-		});
 	</script>
 </body>
 
