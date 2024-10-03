@@ -63,84 +63,6 @@ namespace Api
             return response;
         }
 
-        [Function("addcoin")]
-        public async Task<HttpResponseData> AddCoin([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
-        {
-            var response = req.CreateResponse(HttpStatusCode.OK);
-
-            // Controleer of de juiste magicword is meegegeven
-            if (req.Query["magicword"] != _magicword)
-            {
-                var gifBytes = File.ReadAllBytes("you-didnt-say-the-magic-word-ah-ah.gif");
-                response.Headers.Add("Content-Type", "image/gif");
-                response.Body.Write(gifBytes, 0, gifBytes.Length);
-                return response;
-            }
-
-            _logger.LogInformation("Resetting participants table.");
-
-            var tableClient = GetTableClient("participants");
-
-            // Stap 1: Leeg de tabel participants
-            var entities = tableClient.QueryAsync<TableEntity>();
-            await foreach (var entity in entities)
-            {
-                await tableClient.DeleteEntityAsync(entity.PartitionKey, entity.RowKey);
-            }
-
-            // Stap 2: Voeg coin toe
-            var coin = new TableEntity
-            {
-                PartitionKey = "deelnemer",
-                RowKey = "Coin"
-            };
-
-            var goldenticket = new TableEntity
-            {
-                PartitionKey = "deelnemer",
-                RowKey = "Golden Ticket!"
-            };
-
-            await tableClient.AddEntityAsync(coin);
-            await tableClient.AddEntityAsync(goldenticket);
-
-            // Bericht naar de response schrijven
-            await response.Body.WriteAsync(Encoding.UTF8.GetBytes("Coin en Golden Ticket is toegevoegd"));
-            return response;
-        }
-
-        [Function("resetticket")]
-        public async Task<HttpResponseData> ResetTicket([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
-        {
-            var response = req.CreateResponse(HttpStatusCode.OK);
-            if (req.Query["magicword"] != _magicword)
-            {
-                var gifBytes = File.ReadAllBytes("you-didnt-say-the-magic-word-ah-ah.gif");
-                response.Headers.Add("Content-Type", "image/gif");
-                response.Body.Write(gifBytes, 0, gifBytes.Length);
-                return response;
-            }
-
-
-            _logger.LogInformation("HTTP trigger function processed a request.");
-
-            var tableClient = GetTableClient("goldenticket");
-
-            var partitionKey = "ticket";
-            var rowKey = "drawn";
-
-            await tableClient.UpsertEntityAsync(new Ticket
-            {
-                isdrawn = false,
-                PartitionKey = partitionKey,
-                RowKey = rowKey
-            });
-
-            await response.Body.WriteAsync(Encoding.UTF8.GetBytes("Golden ticket  is gereset"));
-            return response;
-        }
-
-
         [Function("draw")]
         public async Task<string> Ticket([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
         {
@@ -169,31 +91,6 @@ namespace Api
             await ticketTableClient.UpdateEntityAsync(goldenTicket.Value, goldenTicket.Value.ETag);
 
             return winner;
-        }
-
-        [Function("goldenticketstatus")]
-        public async Task<HttpResponseData> GetGoldenTicketStatus([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
-        {
-            var response = req.CreateResponse(HttpStatusCode.OK);
-
-            var tableClient = GetTableClient("goldenticket");
-
-            var partitionKey = "ticket";
-            var rowKey = "drawn";
-
-            try
-            {
-                var goldenTicket = await tableClient.GetEntityAsync<Ticket>(partitionKey, rowKey);
-                var status = new { isdrawn = goldenTicket.Value.isdrawn };
-                await response.WriteAsJsonAsync(status);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving golden ticket status.");
-                response = req.CreateResponse(HttpStatusCode.InternalServerError);
-            }
-
-            return response;
         }
 
         [Function("deelnemers")]

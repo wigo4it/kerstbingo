@@ -5,8 +5,8 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Techorama 2024</title>
-    <link rel="icon" href="/icons/favicon.ico" type="image/x-icon">
-    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+	<link rel="icon" href="/icons/favicon.ico" type="image/x-icon">
+	<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
 	<link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
 	<link rel="manifest" href="/icons/site.webmanifest">
@@ -25,29 +25,10 @@
 
 	<script>
 		const audioElement = document.getElementById('wachtMuziekje');
-		document.addEventListener('DOMContentLoaded', async function () {
+		document.addEventListener('DOMContentLoaded', function () {
 			const button = document.getElementById('button');
 			const textBox = document.getElementById('textBox');
-			let names = [];
-
-			try {
-				const response = await fetch('/api/deelnemers', {
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json'
-					}
-				});
-
-				if (!response.ok) {
-					throw new Error('Network response was not ok');
-				}
-
-				names = await response.json();
-				//names.push('Golden Ticket!');
-			} catch (error) {
-				console.log(error);
-			}
-
+			let names = ['Golden Ticket!', 'Coin'];
 
 			// Function to shuffle the names array
 			function shuffle(array) {
@@ -56,16 +37,20 @@
 					[array[i], array[j]] = [array[j], array[i]];
 				}
 			}
+			// Function to determine the final text
+			function determineFinalText() {
+				const randomNumber = Math.floor(Math.random() * 50);  // Generate a number between 0 and 99
+				return randomNumber === 0 ? "Golden Ticket!" : "Coin"; // 2% chance to be "Golden Ticket"
+			}
 
 			// Function to handle the action
-			async function handleAction() {
+			function handleAction() {
 				const self = button;
 				textBox.classList.remove('final-name');
 				self.classList.remove('rotate');
 				void self.offsetWidth;
 				self.classList.add('rotate');
 
-				// Select the audio element
 				// Play the audio
 				audioElement.play();
 
@@ -75,40 +60,21 @@
 				shuffle(names);  // Shuffle the names before displaying them randomly
 
 				let currentIndex = 0;
-				const intervalTime = 300;
+				const intervalTime = 400;
 				const totalTime = 5020;
 
-                const interval = setInterval(function () {
+				const interval = setInterval(function () {
 					if (names.length > 0) {
 						textBox.style.color = ''; // Reset to default color
-						textBox.textContent = "coin"
-						//textBox.textContent = names[currentIndex];
+						textBox.textContent = names[currentIndex];
 						currentIndex = (currentIndex + 1) % names.length;
 					}
 				}, intervalTime);
-
-				let winner;
-				try {
-					const response = await fetch('/api/draw', {
-						method: 'GET',
-						headers: {
-							'Content-Type': 'application/json'
-						}
-					});
-
-					if (!response.ok) {
-						throw new Error('Network response was not ok');
-					}
-
-					winner = await response.text();
-				} catch (error) {
-					console.log(error);
-				}
-
 				setTimeout(function () {
 					textBox.style.color = '';
 					clearInterval(interval);
-    				textBox.classList.add('final-name');
+					textBox.textContent = determineFinalText();
+					textBox.classList.add('final-name');
 					document.getElementById('confetti').style.display = 'block';
 					document.getElementById('winnaar').play();
 					setTimeout(() => {
@@ -127,23 +93,8 @@
 				if (event.key === 'Enter' || event.key === ' ') {
 					handleAction();
 				}
-				if (event.shiftKey && event.key.toLowerCase() === 'i') {
-					window.location.href = 'index.html';
-				}
-				if (event.shiftKey && event.key.toLowerCase() === 'p') {
-					window.location.href = 'participants.html';
-				}
 				if (event.shiftKey && event.key.toLowerCase() === 'g') {
 					window.location.href = 'game.html';
-				}
-                if (event.shiftKey && event.key.toLowerCase() === 'r') {
-					window.location.href = '/api/resetdeelnemers?magicword=';
-				}
-				if (event.shiftKey && event.key.toLowerCase() === 't') {
-					window.location.href = '/api/resetticket?magicword=';
-				}
-				if (event.shiftKey && event.key.toLowerCase() === 'c') {
-					window.location.href = '/api/addcoin?magicword=';
 				}
 			});
 
