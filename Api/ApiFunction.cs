@@ -43,6 +43,13 @@ namespace Api
             var response = req.CreateResponse(HttpStatusCode.OK);
 
             // Controleer of de juiste magicword is meegegeven
+            if (req.Query["magicword"] != _magicword)
+            {
+                var response = req.CreateResponse(HttpStatusCode.Unauthorized); // Gebruik een meer passende HTTP status code
+                await response.WriteStringAsync("Je hebt niet het juiste magic word gezegd!");
+                return response;
+            }
+
             _logger.LogInformation("Resetting participants table.");
 
             var tableClient = GetTableClient("participants");
@@ -55,7 +62,7 @@ namespace Api
             }
 
             // Controleer of "golden" als parameter wordt meegegeven
-            if (req.Query.AllKeys.Contains("golden"))
+            if (req.Query.TryGetValue("golden", out var goldenValue))
             {
                 // Stap 2: Voeg de testdeelnemers coin en goldenTicket toe
                 var coin = new TableEntity
@@ -83,10 +90,18 @@ namespace Api
             return response;
         }
 
+
         [Function("resetticket")]
         public async Task<HttpResponseData> ResetTicket([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
         {
             var response = req.CreateResponse(HttpStatusCode.OK);
+            if (req.Query["magicword"] != _magicword)
+            {
+                var response = req.CreateResponse(HttpStatusCode.Unauthorized); // Gebruik een meer passende HTTP status code
+                await response.WriteStringAsync("Je hebt niet het juiste magic word gezegd!");
+                return response;
+            }
+
 
             _logger.LogInformation("HTTP trigger function processed a request.");
 
