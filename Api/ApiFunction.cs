@@ -50,19 +50,19 @@ namespace Api
                 return response;
             }
 
-            _logger.LogInformation("Resetting participants table.");
-
-            var tableClient = GetTableClient("participants");
-
-            // Stap 1: Leeg de tabel participants
-            var entities = tableClient.QueryAsync<TableEntity>();
-            await foreach (var entity in entities)
+            if (req.Query["magicword"] == _magicword)
             {
-                await tableClient.DeleteEntityAsync(entity.PartitionKey, entity.RowKey);
+                logger.LogInformation("Resetting participants table.");
+                var tableClient = GetTableClient("participants");
+                // Stap 1: Leeg de tabel participants
+                var entities = tableClient.QueryAsync<TableEntity>();
+                await foreach (var entity in entities)
+                {
+                    await tableClient.DeleteEntityAsync(entity.PartitionKey, entity.RowKey);
+                }
             }
 
-            // Controleer of "golden" als parameter wordt meegegeven
-            if (!string.IsNullOrEmpty(req.Query["golden"]))
+            if (req.Query["magicword"] == _magicword)
             {
                 // Stap 2: Voeg de testdeelnemers coin en goldenTicket toe
                 var coin = new TableEntity
@@ -80,14 +80,10 @@ namespace Api
                 await tableClient.AddEntityAsync(coin);
                 await tableClient.AddEntityAsync(goldenTicket);
 
-                await response.Body.WriteAsync(Encoding.UTF8.GetBytes("Coin en Golden Ticket zijn toegevoegd."));
+                // Bericht naar de response schrijven
+                await response.Body.WriteAsync(Encoding.UTF8.GetBytes("Deelnemers zijn gereset en coin + golden ticket zijn toegevoegd."));
+                return response;
             }
-            else
-            {
-                await response.Body.WriteAsync(Encoding.UTF8.GetBytes("Deelnemers zijn gereset."));
-            }
-
-            return response;
         }
 
 
