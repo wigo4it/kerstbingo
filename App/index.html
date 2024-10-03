@@ -6,6 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Techorama 2024</title>
     <link rel="icon" href="/icons/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="manifest" href="/icons/site.webmanifest">
     <link rel="stylesheet" href="game.css">
 </head>
 
@@ -13,72 +17,76 @@
     <button id="button">Win een CO2 meter!</button>
     <div id="textBox"></div>
     <canvas id="confetti" style="display:none;"></canvas>
-    <audio id="wachtMuziekje" src="assets/wachtMuziekje.mp3" type="audio/mp3"></audio>
-    <audio id="winnaar" src="assets/winnaar.mp3" type="audio/mp3"></audio>
+    <audio id="wachtMuziekje" src="assets/wachtMuziekje.mp3"></audio>
+    <audio id="winnaar" src="assets/winnaar.mp3"></audio>
 
+    <script src="confetti.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', async function () {
-            const button = document.getElementById('button');
-            const textBox = document.getElementById('textBox');
-            const audioElement = document.getElementById('wachtMuziekje');
-            let names = [];
+        const button = document.getElementById('button');
+        const textBox = document.getElementById('textBox');
+        const wachtMuziekje = document.getElementById('wachtMuziekje');
+        const winnaar = document.getElementById('winnaar');
+        const confetti = document.getElementById('confetti');
+        let names = [];
 
-            // Deelnemerslijst ophalen
-            try {
-                const response = await fetch('/api/deelnemers', { method: 'GET' });
-                if (!response.ok) throw new Error('Netwerkfout bij ophalen deelnemers');
-                names = await response.json();
-
-                // Status van het gouden ticket controleren
-                const goldenTicketResponse = await fetch('/api/goldenticketstatus', { method: 'GET' });
-                if (!goldenTicketResponse.ok) throw new Error('Netwerkfout bij status gouden ticket');
-                const { isdrawn } = await goldenTicketResponse.json();
-                if (!isdrawn) names.push('Golden Ticket!');
-            } catch (error) {
-                console.error(error.message);
-            }
-
-            // Namen schudden en weergeven
-            button.addEventListener('click', () => handleAction(names, textBox, audioElement));
-        });
-
-        function shuffle(array) {
+        // Functie om namen te schudden
+        const shuffle = (array) => {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [array[i], array[j]] = [array[j], array[i]];
             }
-        }
+        };
 
-        async function handleAction(names, textBox, audioElement) {
-            shuffle(names);
+        // Functie om te handelen na een klik
+        async function handleAction() {
             textBox.classList.remove('final-name');
-            this.classList.add('rotate');
-            audioElement.play();
+            button.classList.remove('rotate');
+            void button.offsetWidth; // Forceer een reflow
+            button.classList.add('rotate');
+            wachtMuziekje.play();
 
-            let currentIndex = 0;
-            const interval = setInterval(() => {
-                textBox.textContent = names[currentIndex];
-                currentIndex = (currentIndex + 1) % names.length;
-            }, 300);
+            try {
+                const response = await fetch('/api/deelnemers');
+                if (!response.ok) throw new Error('Network response was not ok');
+                names = await response.json();
 
-            // Wacht op de trekking
-            setTimeout(async () => {
-                clearInterval(interval);
-                textBox.classList.add('final-name');
-                const response = await fetch('/api/draw', { method: 'GET' });
-                const winner = await response.text() || "Geen winnaar";
-                textBox.textContent = winner;
-                document.getElementById('confetti').style.display = 'block';
-                document.getElementById('winnaar').play();
+                const goldenTicketResponse = await fetch('/api/goldenticketstatus');
+                if (!goldenTicketResponse.ok) throw new Error('Network response was not ok');
+                const goldenTicket = await goldenTicketResponse.json();
+                if (!goldenTicket.isdrawn) names.push('Golden Ticket!');
 
-                // Audio resetten en pagina herladen
-                setTimeout(() => {
-                    audioElement.pause();
-                    audioElement.currentTime = 0;
-                    window.location.reload();
-                }, 5000);
-            }, 5020);
+                shuffle(names);
+                let currentIndex = 0;
+                const interval = setInterval(() => {
+                    textBox.textContent = names[currentIndex];
+                    currentIndex = (currentIndex + 1) % names.length;
+                }, 300);
+
+                setTimeout(async () => {
+                    clearInterval(interval);
+                    textBox.classList.add('final-name');
+                    confetti.style.display = 'block';
+                    const winnerResponse = await fetch('/api/draw');
+                    if (!winnerResponse.ok) throw new Error('Network response was not ok');
+                    const winner = await winnerResponse.text();
+
+                    winnaar.play();
+                    setTimeout(() => {
+                        wachtMuziekje.pause();
+                        wachtMuziekje.currentTime = 0;
+                        location.reload();
+                    }, 5000);
+                }, 5020);
+            } catch (error) {
+                console.error(error);
+            }
         }
+
+        button.addEventListener('click', handleAction);
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') handleAction();
+        });
     </script>
 </body>
+
 </html>
