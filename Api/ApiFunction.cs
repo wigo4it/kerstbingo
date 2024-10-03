@@ -62,7 +62,7 @@ namespace Api
             }
 
             // Controleer of "golden" als parameter wordt meegegeven
-            if (req.Query.TryGetValue("golden", out var goldenValue))
+            if (!string.IsNullOrEmpty(req.Query["golden"]))
             {
                 // Stap 2: Voeg de testdeelnemers coin en goldenTicket toe
                 var coin = new TableEntity
