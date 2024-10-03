@@ -1,92 +1,150 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Techorama 2024</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Techorama 2024</title>
     <link rel="icon" href="/icons/favicon.ico" type="image/x-icon">
     <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
-    <link rel="manifest" href="/icons/site.webmanifest">
-    <link rel="stylesheet" href="game.css">
+	<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+	<link rel="manifest" href="/icons/site.webmanifest">
+	<link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#5bbad5">
+	<link rel="stylesheet" href="game.css">
 </head>
 
 <body>
-    <button id="button">Win een CO2 meter!</button>
-    <div id="textBox"></div>
-    <canvas id="confetti" style="display:none;"></canvas>
-    <audio id="wachtMuziekje" src="assets/wachtMuziekje.mp3"></audio>
-    <audio id="winnaar" src="assets/winnaar.mp3"></audio>
+	<button id="button">Win een CO2 meter!</button>
+	<div id="textBox"></div>
+	<canvas id="confetti"></canvas>
+	<audio id="wachtMuziekje" src="assets/wachtMuziekje.mp3" type="audio/mp3"></audio>
+	<audio id="winnaar" src="assets/winnaar.mp3" type="audio/mp3"></audio>
 
-    <script src="confetti.js"></script>
-    <script>
-        const button = document.getElementById('button');
-        const textBox = document.getElementById('textBox');
-        const wachtMuziekje = document.getElementById('wachtMuziekje');
-        const winnaar = document.getElementById('winnaar');
-        const confetti = document.getElementById('confetti');
-        let names = [];
+	<script src="confetti.js"></script>
 
-        // Functie om namen te schudden
-        const shuffle = (array) => {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-        };
+	<script>
+		const audioElement = document.getElementById('wachtMuziekje');
+		document.addEventListener('DOMContentLoaded', async function () {
+			const button = document.getElementById('button');
+			const textBox = document.getElementById('textBox');
+			let names = [];
 
-        // Functie om te handelen na een klik
-        async function handleAction() {
-            textBox.classList.remove('final-name');
-            button.classList.remove('rotate');
-            void button.offsetWidth; // Forceer een reflow
-            button.classList.add('rotate');
-            wachtMuziekje.play();
+			try {
+				const response = await fetch('/api/deelnemers', {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json'
+					}
+				});
 
-            try {
-                const response = await fetch('/api/deelnemers');
-                if (!response.ok) throw new Error('Network response was not ok');
-                names = await response.json();
+				if (!response.ok) {
+					throw new Error('Network response was not ok');
+				}
 
-                const goldenTicketResponse = await fetch('/api/goldenticketstatus');
-                if (!goldenTicketResponse.ok) throw new Error('Network response was not ok');
-                const goldenTicket = await goldenTicketResponse.json();
-                if (!goldenTicket.isdrawn) names.push('Golden Ticket!');
+				names = await response.json();
+				//names.push('Golden Ticket!');
+			} catch (error) {
+				console.log(error);
+			}
 
-                shuffle(names);
-                let currentIndex = 0;
-                const interval = setInterval(() => {
-                    textBox.textContent = names[currentIndex];
-                    currentIndex = (currentIndex + 1) % names.length;
-                }, 300);
 
-                setTimeout(async () => {
-                    clearInterval(interval);
-                    textBox.classList.add('final-name');
-                    confetti.style.display = 'block';
-                    const winnerResponse = await fetch('/api/draw');
-                    if (!winnerResponse.ok) throw new Error('Network response was not ok');
-                    const winner = await winnerResponse.text();
+			// Function to shuffle the names array
+			function shuffle(array) {
+				for (let i = array.length - 1; i > 0; i--) {
+					const j = Math.floor(Math.random() * (i + 1));
+					[array[i], array[j]] = [array[j], array[i]];
+				}
+			}
 
-                    winnaar.play();
-                    setTimeout(() => {
-                        wachtMuziekje.pause();
-                        wachtMuziekje.currentTime = 0;
-                        location.reload();
-                    }, 5000);
-                }, 5020);
-            } catch (error) {
-                console.error(error);
-            }
-        }
+			// Function to handle the action
+			async function handleAction() {
+				const self = button;
+				textBox.classList.remove('final-name');
+				self.classList.remove('rotate');
+				void self.offsetWidth;
+				self.classList.add('rotate');
 
-        button.addEventListener('click', handleAction);
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter' || event.key === ' ') handleAction();
-        });
-    </script>
+				// Select the audio element
+				// Play the audio
+				audioElement.play();
+
+				// Stop the audio after 10 seconds
+				document.getElementById('confetti').style.display = 'none';
+
+				shuffle(names);  // Shuffle the names before displaying them randomly
+
+				let currentIndex = 0;
+				const intervalTime = 300;
+				const totalTime = 5020;
+
+                const interval = setInterval(function () {
+					if (names.length > 0) {
+						textBox.style.color = ''; // Reset to default color
+						textBox.textContent = names[currentIndex];
+						currentIndex = (currentIndex + 1) % names.length;
+					}
+				}, intervalTime);
+
+				let winner;
+				try {
+					const response = await fetch('/api/draw', {
+						method: 'GET',
+						headers: {
+							'Content-Type': 'application/json'
+						}
+					});
+
+					if (!response.ok) {
+						throw new Error('Network response was not ok');
+					}
+
+					winner = await response.text();
+				} catch (error) {
+					console.log(error);
+				}
+
+				setTimeout(function () {
+					textBox.style.color = '';
+					clearInterval(interval);
+    				textBox.classList.add('final-name');
+					document.getElementById('confetti').style.display = 'block';
+					document.getElementById('winnaar').play();
+					setTimeout(() => {
+						audioElement.pause();
+						audioElement.currentTime = 0; // Reset the audio to the beginning
+					}, 5000); // 5000 milliseconds = 5 seconds
+					self.classList.remove('rotate');
+				}, totalTime);
+			}
+
+			// Add event listener for the button click
+			button.addEventListener('click', handleAction);
+
+			// Add event listener for the Enter key press
+			document.addEventListener('keydown', function (event) {
+				if (event.key === 'Enter' || event.key === ' ') {
+					handleAction();
+				}
+				if (event.shiftKey && event.key.toLowerCase() === 'i') {
+					window.location.href = 'index.html';
+				}
+				if (event.shiftKey && event.key.toLowerCase() === 'p') {
+					window.location.href = 'participants.html';
+				}
+				if (event.shiftKey && event.key.toLowerCase() === 'g') {
+					window.location.href = 'game.html';
+				}
+                if (event.shiftKey && event.key.toLowerCase() === 'r') {
+					window.location.href = '/api/resetdeelnemers?magicword=';
+				}
+				if (event.shiftKey && event.key.toLowerCase() === 't') {
+					window.location.href = '/api/resetticket?magicword=';
+				}
+			});
+
+		});
+	</script>
 </body>
 
 </html>
