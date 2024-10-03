@@ -41,9 +41,11 @@ namespace Api
         public async Task<HttpResponseData> ResetDeelnemers([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
         {
             var response = req.CreateResponse(HttpStatusCode.OK);
+            if (req.Query["magicword"] != _magicword)
             {
-                var response = req.CreateResponse(HttpStatusCode.Unauthorized); // Gebruik een meer passende HTTP status code
-                await response.WriteStringAsync("Je hebt niet het juiste magic word gezegd!");
+                var gifBytes = File.ReadAllBytes("you-didnt-say-the-magic-word-ah-ah.gif");
+                response.Headers.Add("Content-Type", "image/gif");
+                response.Body.Write(gifBytes, 0, gifBytes.Length);
                 return response;
             }
 
@@ -68,8 +70,9 @@ namespace Api
             var response = req.CreateResponse(HttpStatusCode.OK);
             if (req.Query["magicword"] != _magicword)
             {
-                var response = req.CreateResponse(HttpStatusCode.Unauthorized); // Gebruik een meer passende HTTP status code
-                await response.WriteStringAsync("Je hebt niet het juiste magic word gezegd!");
+                var gifBytes = File.ReadAllBytes("you-didnt-say-the-magic-word-ah-ah.gif");
+                response.Headers.Add("Content-Type", "image/gif");
+                response.Body.Write(gifBytes, 0, gifBytes.Length);
                 return response;
             }
 
