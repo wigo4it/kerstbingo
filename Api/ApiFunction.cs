@@ -95,10 +95,17 @@ namespace Api
                 RowKey = "Coin"
             };
 
+            var goldenticket = new TableEntity
+            {
+                PartitionKey = "deelnemer",
+                RowKey = "Golden Ticket!"
+            };
+
             await tableClient.AddEntityAsync(coin);
+            await tableClient.AddEntityAsync(goldenticket);
 
             // Bericht naar de response schrijven
-            await response.Body.WriteAsync(Encoding.UTF8.GetBytes("Coin is toegevoegd"));
+            await response.Body.WriteAsync(Encoding.UTF8.GetBytes("Coin en Golden Ticket is toegevoegd"));
             return response;
         }
 
