@@ -43,14 +43,6 @@ namespace Api
             var response = req.CreateResponse(HttpStatusCode.OK);
 
             // Controleer of de juiste magicword is meegegeven
-            if (req.Query["magicword"] != _magicword)
-            {
-                var gifBytes = File.ReadAllBytes("you-didnt-say-the-magic-word-ah-ah.gif");
-                response.Headers.Add("Content-Type", "image/gif");
-                response.Body.Write(gifBytes, 0, gifBytes.Length);
-                return response;
-            }
-
             _logger.LogInformation("Resetting participants table.");
 
             var tableClient = GetTableClient("participants");
@@ -91,19 +83,10 @@ namespace Api
             return response;
         }
 
-
         [Function("resetticket")]
         public async Task<HttpResponseData> ResetTicket([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
         {
             var response = req.CreateResponse(HttpStatusCode.OK);
-            if (req.Query["magicword"] != _magicword)
-            {
-                var gifBytes = File.ReadAllBytes("you-didnt-say-the-magic-word-ah-ah.gif");
-                response.Headers.Add("Content-Type", "image/gif");
-                response.Body.Write(gifBytes, 0, gifBytes.Length);
-                return response;
-            }
-
 
             _logger.LogInformation("HTTP trigger function processed a request.");
 
