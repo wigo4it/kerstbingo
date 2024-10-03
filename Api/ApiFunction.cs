@@ -6,7 +6,7 @@ using Azure.Data.Tables;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging; 
+using Microsoft.Extensions.Logging;
 
 namespace Api
 {
@@ -162,6 +162,31 @@ namespace Api
             await ticketTableClient.UpdateEntityAsync(goldenTicket.Value, goldenTicket.Value.ETag);
 
             return winner;
+        }
+
+        [Function("goldenticketstatus")]
+        public async Task<HttpResponseData> GetGoldenTicketStatus([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
+        {
+            var response = req.CreateResponse(HttpStatusCode.OK);
+
+            var tableClient = GetTableClient("goldenticket");
+
+            var partitionKey = "ticket";
+            var rowKey = "drawn";
+
+            try
+            {
+                var goldenTicket = await tableClient.GetEntityAsync<Ticket>(partitionKey, rowKey);
+                var status = new { isdrawn = goldenTicket.Value.isdrawn };
+                await response.WriteAsJsonAsync(status);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving golden ticket status.");
+                response = req.CreateResponse(HttpStatusCode.InternalServerError);
+            }
+
+            return response;
         }
 
         [Function("deelnemers")]
