@@ -63,6 +63,51 @@ namespace Api
             return response;
         }
 
+        [Function("addticket")]
+        public async Task<HttpResponseData> AddTicket([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
+        {
+            var response = req.CreateResponse(HttpStatusCode.OK);
+
+            // Controleer of de juiste magicword is meegegeven
+            if (req.Query["magicword"] != _magicword)
+            {
+                var gifBytes = File.ReadAllBytes("you-didnt-say-the-magic-word-ah-ah.gif");
+                response.Headers.Add("Content-Type", "image/gif");
+                response.Body.Write(gifBytes, 0, gifBytes.Length);
+                return response;
+            }
+
+            _logger.LogInformation("Resetting participants table.");
+
+            var tableClient = GetTableClient("participants");
+
+            // Stap 1: Leeg de tabel participants
+            var entities = tableClient.QueryAsync<TableEntity>();
+            await foreach (var entity in entities)
+            {
+                await tableClient.DeleteEntityAsync(entity.PartitionKey, entity.RowKey);
+            }
+
+            // Stap 2: Voeg ticket en coin toe
+            var ticket = new TableEntity
+            {
+                PartitionKey = "deelnemer",
+                RowKey = "Golden Ticket!"
+            };
+
+            var coin = new TableEntity
+            {
+                PartitionKey = "deelnemer",
+                RowKey = "Coin"
+            };
+
+            await tableClient.AddEntityAsync(ticket);
+            await tableClient.AddEntityAsync(coin);
+
+            // Bericht naar de response schrijven
+            await response.Body.WriteAsync(Encoding.UTF8.GetBytes("Golden Ticket is toegevoegd"));
+            return response;
+        }
 
         [Function("resetticket")]
         public async Task<HttpResponseData> ResetTicket([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
