@@ -28,7 +28,7 @@
 		document.addEventListener('DOMContentLoaded', function () {
 			const button = document.getElementById('button');
 			const textBox = document.getElementById('textBox');
-			let names = ['Golden Ticket!', 'Coin'];
+			let names = ['CO2 Meter!', 'Coin'];
 
 			// Function to shuffle the names array
 			function shuffle(array) {
@@ -40,7 +40,7 @@
 			// Function to determine the final text
 			function determineFinalText() {
 				const randomNumber = Math.floor(Math.random() * 50);  // Generate a number between 0 and 49
-				return randomNumber === 0 ? "Golden Ticket!" : "Coin"; // 2% chance to be "Golden Ticket"
+				return randomNumber === 0 ? "CO2 Meter!" : "Coin"; // 2% chance to be "Golden Ticket"
 			}
 
 			// Function to handle the action
@@ -79,8 +79,8 @@
 					document.getElementById('confetti').style.display = 'block';
 					document.getElementById('winnaar').play();
 
-					// Only pause the audio and reset if the text is not "Golden Ticket!"
-					if (finalText !== "Golden Ticket!") {
+					// Only pause the audio and reset if the text is not "CO2 Meter!"
+					if (finalText !== "CO2 Meter!") {
 						setTimeout(() => {
 							audioElement.pause();
 							audioElement.currentTime = 0; // Reset the audio to the beginning
