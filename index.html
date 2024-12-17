@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Kwartaalmeeting zomer 2024</title>
+	<link rel="stylesheet" href="game.css">
+</head>
+
+<style>
+	.rotate {
+		--animation-duration: 24700ms;
+		--animation-divisor: 4;
+	}
+</style>
+
+<body>
+	<button id="button">Kerst verrassing?</button>
+	<div id="textBox"></div>
+	<audio id="wachtMuziekje" src="wachtMuziekje.mp3" type="audio/mp3"></audio>
+	<audio id="winnaar" src="winnaar.mp3" type="audio/mp3"></audio>
+	<a href="https://brave-flower-0b3176903.5.azurestaticapps.net/game/index.html" class="background-link"></a>
+
+    <!-- Container voor sneeuwvlokken -->
+    <div id="snow-container"></div>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			const button = document.getElementById('button');
+			const textBox = document.getElementById('textBox');
+			let names = [];
+
+			fetch('game.csv')
+				.then(response => response.text())
+				.then(data => {
+					names = data.split(',');
+					console.log(names);
+				});
+
+			function handleAction() {
+				const self = button;
+				textBox.classList.remove('final-name');
+				self.classList.remove('rotate');
+				void self.offsetWidth;
+				self.classList.add('rotate');
+
+				document.getElementById('wachtMuziekje').play();
+				
+				// Verberg eventueel de sneeuw tot de winnaar bekend is
+				document.getElementById('snow-container').style.display = 'none';
+
+				let currentIndex = 0;
+				const intervalTime = 400;
+				const totalTime = 24700;
+
+				const interval = setInterval(function () {
+					if (names.length > 0) {
+						textBox.textContent = names[currentIndex];
+						currentIndex = (currentIndex + 1) % names.length;
+					}
+				}, intervalTime);
+
+				setTimeout(function () {
+					clearInterval(interval);
+					if (names.length > 0) {
+						const randomIndex = Math.floor(Math.random() * names.length);
+						textBox.textContent = names[randomIndex]; // Display a random name
+						textBox.classList.add('final-name');
+						self.classList.remove('rotate');
+					}
+				}, totalTime);
+
+				// Show the snow and play sound after x seconds
+				setTimeout(function () {
+					document.getElementById('snow-container').style.display = 'block';
+					document.getElementById('winnaar').play();
+					startSnow();
+				}, totalTime + 100); 
+			}
+
+			button.addEventListener('click', handleAction);
+
+			document.addEventListener('keydown', function (event) {
+				if (event.key === 'Enter'|| event.key === ' ') {
+					handleAction();
+				}
+			});
+		});
+	</script>
+
+    <script>
+        function startSnow() {
+            // Verwijder oude sneeuwvlokken als ze er zijn
+            const container = document.getElementById('snow-container');
+            container.innerHTML = '';
+
+            // Aantal sneeuwvlokken
+            const snowCount = 100;
+
+            for (let i = 0; i < snowCount; i++) {
+                const snowflake = document.createElement('div');
+                snowflake.classList.add('snowflake');
+                snowflake.style.left = Math.random() * 100 + '%';
+                snowflake.style.animationDelay = Math.random() * 5 + 's';
+                snowflake.style.animationDuration = 5 + Math.random() * 5 + 's';
+                container.appendChild(snowflake);
+            }
+        }
+    </script>
+
+	<style>
+		/* Stijl voor de finale naam (optioneel) */
+		.final-name {
+			font-weight: bold;
+			color: red;
+			font-size: 2em;
+		}
+
+        /* Sneeuw styling */
+        #snow-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* klik niet tegenhouden */
+            overflow: hidden;
+            display: none;
+            z-index: 9999;
+        }
+
+        .snowflake {
+            position: absolute;
+            top: -2em;
+            width: 1em;
+            height: 1em;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.8;
+            animation-name: fall;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-2em);
+            }
+            100% {
+                transform: translateY(110vh);
+            }
+        }
+	</style>
+</body>
+</html>
