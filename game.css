@@ -27,30 +27,34 @@ body {
     left: 50%;
     width: 15vw;
     height: 15vw;
-    padding-top: 1vw;
-    padding-bottom: 0.7vw;
-    padding-left: 1vw;
-    padding-right: 1vw;
-    font-size: 1.8vw;
-    color: rgb(47, 12, 39);
-    border: 0.40vw solid #7e3875;
-    border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-family: 'Anderson Four Feather Falls', sans-serif;
     transform: translate(-50%, -125%);
-    background: #e963b4;
-    box-shadow: 0 0 2vw rgba(0, 0, 0, 2), /* Even shadow all around */
-                inset 0 0.5vw 1vw rgba(255, 255, 255, 0.5), /* Inner top light */
-                inset 0 -0.5vw 1vw rgba(0, 0, 0, 1); /* Inner bottom shadow */
+    border: 0.5vw solid #bb0c0c;
+    border-radius: 50%;
+    font-family: 'Anderson Four Feather Falls', sans-serif;
+    font-size: 1.8vw;
+    color: #bb0c0c;
+    
+    /* Achtergrond als sneeuwbal: wit met een subtiele blauwe gloed */
+    background: radial-gradient(circle at 30% 30%, #ffffff, #d9f0f7 80%);
+    
+    /* Zachte schaduwen voor diepte */
+    box-shadow: 
+        0 0 2vw rgba(0, 0, 0, 0.5),         /* externe schaduw om 3D effect te geven */
+        inset 0 0.5vw 1vw rgba(255, 255, 255, 0.8), /* lichte glans aan de bovenkant */
+        inset 0 -0.5vw 1vw #bb0c0c; /* subtiele schaduw onderin voor ronde vorm */
+
+    /* Animatie transities bij indrukken */
     transition: box-shadow 0.2s, transform 0.2s;
 }
 
 #button:active {
-    box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.5),
-                inset 0 0.5vw 1vw rgba(255, 255, 255, 0.2), /* Inner top light */
-                inset 0 -0.5vw 1vw rgba(0, 0, 0, 0.5); /* Inner bottom shadow */
+    box-shadow: 
+        0 0.5vw 1vw rgba(0, 0, 0, 0.3),
+        inset 0 0.5vw 1vw rgba(255, 255, 255, 0.5),
+        inset 0 -0.5vw 1vw rgba(173, 216, 230, 0.5);
     transform: translate(-50%, -120%) scale(0.98);
 }
 
@@ -65,8 +69,8 @@ body {
     font-family: 'Anderson Four Feather Falls', sans-serif;
     padding-left: 1vw;
     padding-right: 1vw;
-    color: #005452;
-    border: 0.45vw solid #005452;
+    color: #bb0c0c;
+    border: 0.45vw solid #bb0c0c;
     background-color: white;
     box-sizing: border-box;
     display: flex;
@@ -86,16 +90,16 @@ body {
 
 @keyframes rotate {
     0% {
-        transform: translate(-50%, -125%) rotate(0deg); /* Starting position */
+        transform: translate(-50%, -125%) rotate(0deg); 
     }
     25% {
-        transform: translate(-90%, -100%) rotate(180deg); /* Mid-point - reaches the 'to' state */
+        transform: translate(-90%, -100%) rotate(180deg); 
     }
     50% {
-        transform: translate(-20%, -100%) rotate(360deg); /* Mid-point - reaches the 'to' state */
+        transform: translate(-20%, -100%) rotate(360deg); 
     }
     100% {
-        transform: translate(-50%, -125%) rotate(720deg); /* End position - returns to the 'from' state with an additional rotation */
+        transform: translate(-50%, -125%) rotate(720deg); 
     }
 }
 

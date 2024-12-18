@@ -4,19 +4,19 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Kwartaalmeeting zomer 2024</title>
+	<title>Kerstbingo</title>
 	<link rel="stylesheet" href="game.css">
 </head>
 
 <style>
 	.rotate {
-		--animation-duration: 24700ms;
-		--animation-divisor: 4;
+		--animation-duration: 10000ms;
+		--animation-divisor: 2;
 	}
 </style>
 
 <body>
-	<button id="button">Kerst verrassing?</button>
+	<button id="button">En de winnaar is?</button>
 	<div id="textBox"></div>
 	<audio id="wachtMuziekje" src="wachtMuziekje.mp3" type="audio/mp3"></audio>
 	<audio id="winnaar" src="winnaar.mp3" type="audio/mp3"></audio>
@@ -50,14 +50,14 @@
 				// Verberg eventueel de sneeuw tot de winnaar bekend is
 				document.getElementById('snow-container').style.display = 'none';
 
-				let currentIndex = 0;
 				const intervalTime = 400;
-				const totalTime = 24700;
+				const totalTime = 10000;
 
 				const interval = setInterval(function () {
 					if (names.length > 0) {
-						textBox.textContent = names[currentIndex];
-						currentIndex = (currentIndex + 1) % names.length;
+						// Toon bij elke update een willekeurige naam
+						const randomIndex = Math.floor(Math.random() * names.length);
+						textBox.textContent = names[randomIndex];
 					}
 				}, intervalTime);
 
@@ -65,7 +65,7 @@
 					clearInterval(interval);
 					if (names.length > 0) {
 						const randomIndex = Math.floor(Math.random() * names.length);
-						textBox.textContent = names[randomIndex]; // Display a random name
+						textBox.textContent = names[randomIndex]; 
 						textBox.classList.add('final-name');
 						self.classList.remove('rotate');
 					}
